@@ -84,15 +84,15 @@ class MainActivity : AppCompatActivity() {
         }, ContextCompat.getMainExecutor(this))
     }
 
-    private class FrameAnalyzer : ImageAnalysis.Analyzer {
+    private inner class FrameAnalyzer : ImageAnalysis.Analyzer {
         override fun analyze(image: ImageProxy) {
             // We will pass the buffer to C++ here
             // For now, just log
             // Log.d(TAG, "Frame received: ${image.width}x${image.height}")
             
-            // Example of passing data to JNI (to be implemented fully later)
-            // val buffer = image.planes[0].buffer
-            // processFrame(image.width, image.height, buffer)
+            // Example of passing data to JNI
+            val buffer = image.planes[0].buffer
+            processFrame(image.width, image.height, buffer)
             
             image.close()
         }
@@ -109,4 +109,7 @@ class MainActivity : AppCompatActivity() {
             System.loadLibrary("edgeviewer")
         }
     }
+
+    external fun stringFromJNI(): String
+    external fun processFrame(width: Int, height: Int, buffer: java.nio.ByteBuffer)
 }

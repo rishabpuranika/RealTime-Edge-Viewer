@@ -18,10 +18,17 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         
-        externalNativeBuild {
-            cmake {
-                cppFlags "-std=c++17"
-                arguments "-DANDROID_STL=c++_shared"
+            externalNativeBuild {
+                cmake {
+                    cppFlags "-std=c++17"
+                    arguments "-DANDROID_STL=c++_static"
+                }
+            }
+
+
+        sourceSets {
+            main {
+                // jniLibs.srcDirs = ['/home/rishvaish/Android/OpenCV-android-sdk/sdk/native/libs']
             }
         }
     }
@@ -45,7 +52,7 @@ android {
             version '3.22.1'
         }
     }
-    ndkVersion '25.1.8937393'
+    ndkVersion '27.0.12077973'
 }
 
 dependencies {
