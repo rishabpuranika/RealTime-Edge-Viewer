@@ -1,5 +1,6 @@
 #include <GLES2/gl2.h>
 #include <android/log.h>
+#include <atomic>
 #include <jni.h>
 #include <mutex>
 #include <opencv2/opencv.hpp>
@@ -133,6 +134,19 @@ Java_com_example_realtime_1edge_1viewer_MainActivity_nativeRenderGL(
   glDisableVertexAttribArray(gTexCoordHandle);
 }
 
+// Global thresholds with default values
+std::atomic<int> gLowThreshold(50);
+std::atomic<int> gHighThreshold(150);
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_example_realtime_1edge_1viewer_MainActivity_setThresholds(JNIEnv *env,
+                                                                   jobject thiz,
+                                                                   jint low,
+                                                                   jint high) {
+  gLowThreshold = low;
+  gHighThreshold = high;
+}
+
 extern "C" JNIEXPORT void JNICALL
 Java_com_example_realtime_1edge_1viewer_MainActivity_processFrame(
     JNIEnv *env, jobject /* this */, jint width, jint height, jobject buffer) {
@@ -143,7 +157,8 @@ Java_com_example_realtime_1edge_1viewer_MainActivity_processFrame(
 
   cv::Mat grayMat(height, width, CV_8UC1, srcLumaPtr);
   cv::Mat edges;
-  cv::Canny(grayMat, edges, 50, 150);
+  // Use atomic thresholds
+  cv::Canny(grayMat, edges, gLowThreshold.load(), gHighThreshold.load());
 
   // Copy to shared frame for rendering
   {
@@ -155,4 +170,26 @@ Java_com_example_realtime_1edge_1viewer_MainActivity_processFrame(
     edges.copyTo(gSharedFrame);
     gFrameReady = true;
   }
+}
+
+extern "C" JNIEXPORT jbyteArray JNICALL
+Java_com_example_realtime_1edge_1viewer_MainActivity_getJPEG(JNIEnv *env,
+                                                             jobject thiz) {
+  std::vector<uchar> buf;
+  {
+    std::lock_guard<std::mutex> lock(gFrameMutex);
+    if (gSharedFrame.empty()) {
+      return nullptr;
+    }
+    // Rotate frame for streaming (90 degrees clockwise)
+    cv::Mat rotated;
+    cv::rotate(gSharedFrame, rotated, cv::ROTATE_90_CLOCKWISE);
+
+    // Encode to JPEG
+    cv::imencode(".jpg", rotated, buf);
+  }
+
+  jbyteArray ret = env->NewByteArray(buf.size());
+  env->SetByteArrayRegion(ret, 0, buf.size(), (jbyte *)buf.data());
+  return ret;
 }

@@ -1,8 +1,10 @@
 :root {
   --bg-color: #050505;
   --panel-bg: rgba(20, 20, 20, 0.8);
-  --primary-color: #00f3ff; /* Cyan */
-  --secondary-color: #ff0055; /* Red/Pink */
+  --primary-color: #00f3ff;
+  /* Cyan */
+  --secondary-color: #ff0055;
+  /* Red/Pink */
   --text-color: #ffffff;
   --text-dim: #888888;
   --font-family: 'Inter', sans-serif;
@@ -183,18 +185,80 @@ body {
 
 /* Animations */
 @keyframes scan {
-  0% { top: 0%; opacity: 0; }
-  10% { opacity: 1; }
-  90% { opacity: 1; }
-  100% { top: 100%; opacity: 0; }
+  0% {
+    top: 0%;
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  90% {
+    opacity: 1;
+  }
+
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
 }
 
 @keyframes blink {
-  50% { opacity: 0; }
+  50% {
+    opacity: 0;
+  }
 }
 
 @keyframes pulse {
-  0% { opacity: 1; }
-  50% { opacity: 0.5; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes flash {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+.controls-panel {
+  position: absolute;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(10, 10, 10, 0.8);
+  backdrop-filter: blur(10px);
+  padding: 15px;
+  border-radius: 10px;
+  border: 1px solid var(--neon-cyan);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 80%;
+  max-width: 400px;
+}
+
+.slider-group {
+  display: flex;
+  flex-direction: column;
+  color: var(--neon-cyan);
+  font-family: 'Courier New', monospace;
+}
+
+input[type=range] {
+  width: 100%;
+  accent-color: var(--neon-cyan);
 }
