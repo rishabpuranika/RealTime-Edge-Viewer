@@ -23,7 +23,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var glSurfaceView: GLSurfaceView
     private lateinit var fpsText: android.widget.TextView
+    private lateinit var ipText: android.widget.TextView
     private lateinit var renderer: EdgeRenderer
+    private lateinit var remoteControlServer: RemoteControlServer
 
     private val activityResultLauncher =
         registerForActivityResult(
@@ -42,6 +44,7 @@ class MainActivity : AppCompatActivity() {
 
         glSurfaceView = findViewById(R.id.viewFinder)
         fpsText = findViewById(R.id.fps_text)
+        ipText = findViewById(R.id.ip_text)
         glSurfaceView.setEGLContextClientVersion(2)
         renderer = EdgeRenderer()
         glSurfaceView.setRenderer(renderer)
@@ -58,16 +61,20 @@ class MainActivity : AppCompatActivity() {
         } else {
             activityResultLauncher.launch(Manifest.permission.CAMERA)
         }
-        RemoteControlServer().start()
+        
+        remoteControlServer = RemoteControlServer()
+        remoteControlServer.start()
         MJPEGServer().start()
         showIpAddress()
     }
 
+
     private fun showIpAddress() {
         val wifiManager = applicationContext.getSystemService(android.content.Context.WIFI_SERVICE) as android.net.wifi.WifiManager
         val ipAddress = android.text.format.Formatter.formatIpAddress(wifiManager.connectionInfo.ipAddress)
-        Toast.makeText(this, "Control available at ws://$ipAddress:8081", Toast.LENGTH_LONG).show()
-        Log.d(TAG, "Control available at ws://$ipAddress:8081")
+        val msg = "Control: http://$ipAddress:5173 | Stream: ws://$ipAddress:8081"
+        ipText.text = "IP: $ipAddress"
+        Log.d(TAG, "IP Address: $ipAddress")
     }
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
@@ -132,6 +139,13 @@ class MainActivity : AppCompatActivity() {
                 
                 runOnUiThread {
                     fpsText.text = "FPS: $fps"
+                }
+                
+                if (::remoteControlServer.isInitialized) {
+                    Log.d(TAG, "Broadcasting FPS: $fps")
+                    remoteControlServer.broadcast("{\"type\": \"fps\", \"value\": $fps}")
+                } else {
+                    Log.w(TAG, "RemoteControlServer not initialized yet")
                 }
             }
         }

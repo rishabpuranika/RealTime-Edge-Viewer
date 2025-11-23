@@ -94,6 +94,18 @@ function connectWebSocket(input: string) {
     if (imgEl) imgEl.remove();
   };
 
+  socket.onmessage = (event) => {
+    console.log("Received message:", event.data);
+    try {
+      const data = JSON.parse(event.data);
+      if (data.type === 'fps') {
+        fpsEl.innerText = data.value;
+      }
+    } catch (e) {
+      console.error("Error parsing message", e);
+    }
+  };
+
   socket.onerror = (err) => {
     console.error("WebSocket error", err);
   };
