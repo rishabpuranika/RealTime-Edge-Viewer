@@ -13,7 +13,7 @@ const highVal = document.getElementById('high-val') as HTMLElement;
 
 // State
 let socket: WebSocket | null = null;
-let isConnected = false;
+// Removed unused 'isConnected' variable to fix TS6133 error
 
 // Create Input for IP
 const ipInputContainer = document.createElement('div');
@@ -66,7 +66,7 @@ function connectWebSocket(input: string) {
   socket = new WebSocket(url);
 
   socket.onopen = () => {
-    isConnected = true;
+    // Removed assignment to unused variable
     statusEl.innerText = "CONNECTED";
     statusEl.style.color = "#00f3ff";
     ipInputContainer.style.display = 'none';
@@ -84,7 +84,7 @@ function connectWebSocket(input: string) {
   };
 
   socket.onclose = () => {
-    isConnected = false;
+    // Removed assignment to unused variable
     statusEl.innerText = "DISCONNECTED";
     statusEl.style.color = "#ffaa00";
     ipInputContainer.style.display = 'flex';
