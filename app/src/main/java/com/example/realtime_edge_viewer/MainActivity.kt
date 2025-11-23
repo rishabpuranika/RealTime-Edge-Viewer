@@ -2,6 +2,7 @@ package com.example.realtime_edge_viewer
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.opengl.GLSurfaceView
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -10,17 +11,18 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
-import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import javax.microedition.khronos.egl.EGLConfig
+import javax.microedition.khronos.opengles.GL10
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var cameraExecutor: ExecutorService
-    private lateinit var viewFinder: PreviewView
+    private lateinit var glSurfaceView: GLSurfaceView
+    private lateinit var renderer: EdgeRenderer
 
     private val activityResultLauncher =
         registerForActivityResult(
@@ -37,7 +39,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        viewFinder = findViewById(R.id.viewFinder)
+        glSurfaceView = findViewById(R.id.viewFinder)
+        glSurfaceView.setEGLContextClientVersion(2)
+        renderer = EdgeRenderer()
+        glSurfaceView.setRenderer(renderer)
+        glSurfaceView.renderMode = GLSurfaceView.RENDERMODE_CONTINUOUSLY
+
         cameraExecutor = Executors.newSingleThreadExecutor()
 
         if (ContextCompat.checkSelfPermission(
@@ -57,11 +64,8 @@ class MainActivity : AppCompatActivity() {
         cameraProviderFuture.addListener({
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
 
-            val preview = Preview.Builder()
-                .build()
-                .also {
-                    it.setSurfaceProvider(viewFinder.surfaceProvider)
-                }
+            // We no longer need Preview use case since we render manually
+            // val preview = Preview.Builder().build() ...
 
             val imageAnalyzer = ImageAnalysis.Builder()
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
@@ -74,8 +78,9 @@ class MainActivity : AppCompatActivity() {
 
             try {
                 cameraProvider.unbindAll()
+                // Bind only image analysis
                 cameraProvider.bindToLifecycle(
-                    this, cameraSelector, preview, imageAnalyzer
+                    this, cameraSelector, imageAnalyzer
                 )
             } catch (exc: Exception) {
                 Log.e(TAG, "Use case binding failed", exc)
@@ -86,15 +91,23 @@ class MainActivity : AppCompatActivity() {
 
     private inner class FrameAnalyzer : ImageAnalysis.Analyzer {
         override fun analyze(image: ImageProxy) {
-            // We will pass the buffer to C++ here
-            // For now, just log
-            // Log.d(TAG, "Frame received: ${image.width}x${image.height}")
-            
-            // Example of passing data to JNI
             val buffer = image.planes[0].buffer
             processFrame(image.width, image.height, buffer)
-            
             image.close()
+        }
+    }
+
+    private inner class EdgeRenderer : GLSurfaceView.Renderer {
+        override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
+            nativeInitGL()
+        }
+
+        override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
+            nativeResizeGL(width, height)
+        }
+
+        override fun onDrawFrame(gl: GL10?) {
+            nativeRenderGL()
         }
     }
 
@@ -110,6 +123,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    external fun stringFromJNI(): String
     external fun processFrame(width: Int, height: Int, buffer: java.nio.ByteBuffer)
+    external fun nativeInitGL()
+    external fun nativeResizeGL(width: Int, height: Int)
+    external fun nativeRenderGL()
 }
