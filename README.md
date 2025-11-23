@@ -36,7 +36,7 @@ A high-performance Android application that captures camera frames, performs Can
 ### 🎥 Demo (GIFs)
 | Web Viewer Demo | Android App Demo |
 |:---:|:---:|
-| ![Web Demo](screenshots/laptop.gif) | ![Android Demo](screenshots/phone.gif) |
+| ![Web Demo](screenshots/laptop.gif) | ![Android Demo](screenshots/mobile.gif) |
 
 ## ⚠️ Important: Deployment & Usage
 
