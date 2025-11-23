@@ -1,0 +1,22 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <circle cx="32" cy="32" r="30" fill="#0a0a12" stroke="#00f3ff" stroke-width="2"/>
+  
+  <!-- Outer Ring -->
+  <circle cx="32" cy="32" r="24" stroke="#00f3ff" stroke-width="1" stroke-dasharray="4 2" opacity="0.7"/>
+  
+  <!-- Iris -->
+  <circle cx="32" cy="32" r="14" fill="#00f3ff" fill-opacity="0.2" stroke="#00f3ff" stroke-width="2"/>
+  
+  <!-- Pupil -->
+  <circle cx="32" cy="32" r="6" fill="#ffffff"/>
+  
+  <!-- Tech Accents -->
+  <path d="M32 2V8" stroke="#00f3ff" stroke-width="2"/>
+  <path d="M32 56V62" stroke="#00f3ff" stroke-width="2"/>
+  <path d="M2 32H8" stroke="#00f3ff" stroke-width="2"/>
+  <path d="M56 32H62" stroke="#00f3ff" stroke-width="2"/>
+  
+  <!-- Glare -->
+  <circle cx="26" cy="26" r="3" fill="white" fill-opacity="0.5"/>
+</svg>

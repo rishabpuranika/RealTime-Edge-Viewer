@@ -8,8 +8,11 @@ A high-performance Android application that captures camera frames, performs Can
 -   **Native C++ Processing**: High-performance image processing using OpenCV 4.12.0.
 -   **Canny Edge Detection**: Real-time edge detection algorithm.
 -   **OpenGL ES 2.0 Rendering**: Low-latency rendering of processed frames via `GLSurfaceView`.
+-   **Real-Time Streaming**: MJPEG video stream from Android to Web Viewer (Port 8080).
+-   **Remote Control**: WebSocket-based control (Port 8081) to adjust Canny thresholds in real-time.
+-   **Remote Snapshots**: Capture and save high-quality frames to the Android Gallery directly from the web interface.
 -   **Static Linking**: Self-contained native library (no external dependencies required at runtime).
--   **Web Viewer UI**: A premium, Cyberpunk-themed web interface (TypeScript/Vite) for viewing the feed (simulation).
+-   **Web Viewer UI**: A premium, Cyberpunk-themed web interface (TypeScript/Vite) for viewing the feed and controlling the app.
 
 ## Prerequisites
 
