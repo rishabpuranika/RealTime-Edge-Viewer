@@ -51,7 +51,12 @@ const GLfloat vertices[] = {
 // Note: CameraX usually gives rotated frames, so we might need to adjust
 // rotation here or in Java. For now, let's assume standard orientation and
 // adjust if needed.
-const GLfloat texCoords[] = {0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f};
+const GLfloat texCoords[] = {
+    1.0f, 1.0f, // Bottom-left (was 0,1) -> 1,1
+    1.0f, 0.0f, // Bottom-right (was 1,1) -> 1,0
+    0.0f, 1.0f, // Top-left (was 0,0) -> 0,1
+    0.0f, 0.0f  // Top-right (was 1,0) -> 0,0
+};
 
 GLuint loadShader(GLenum type, const char *shaderCode) {
   GLuint shader = glCreateShader(type);

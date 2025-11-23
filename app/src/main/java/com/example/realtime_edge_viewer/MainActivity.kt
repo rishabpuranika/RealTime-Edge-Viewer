@@ -22,6 +22,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var glSurfaceView: GLSurfaceView
+    private lateinit var fpsText: android.widget.TextView
     private lateinit var renderer: EdgeRenderer
 
     private val activityResultLauncher =
@@ -40,6 +41,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         glSurfaceView = findViewById(R.id.viewFinder)
+        fpsText = findViewById(R.id.fps_text)
         glSurfaceView.setEGLContextClientVersion(2)
         renderer = EdgeRenderer()
         glSurfaceView.setRenderer(renderer)
@@ -98,6 +100,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private inner class EdgeRenderer : GLSurfaceView.Renderer {
+        private var startTime = System.nanoTime()
+        private var frameCount = 0
+
         override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
             nativeInitGL()
         }
@@ -108,6 +113,18 @@ class MainActivity : AppCompatActivity() {
 
         override fun onDrawFrame(gl: GL10?) {
             nativeRenderGL()
+            
+            frameCount++
+            val currentTime = System.nanoTime()
+            if (currentTime - startTime >= 1_000_000_000) {
+                val fps = frameCount
+                frameCount = 0
+                startTime = currentTime
+                
+                runOnUiThread {
+                    fpsText.text = "FPS: $fps"
+                }
+            }
         }
     }
 
