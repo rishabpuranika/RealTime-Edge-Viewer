@@ -108,5 +108,10 @@ The project uses a hybrid architecture combining high-performance native code wi
 ## Troubleshooting
 
 - **Connection Failed**: Ensure both devices are on the **same WiFi**. Check if the phone's IP is correct.
+-   **Camera Permission**: Grant camera permissions when prompted.
 - **No Video**: Check camera permissions on Android.
 - **Build Errors**: Verify NDK version (27.0.x) and OpenCV path in `CMakeLists.txt`.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
